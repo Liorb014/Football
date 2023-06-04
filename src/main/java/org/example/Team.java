@@ -11,10 +11,6 @@ public class Team {
     private Integer position;
     public static final int POINTS_START = 0;
 
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
     public Team(String line) {
         String[] temp =line.split(",");
         this.id = Integer.parseInt(temp[0]);

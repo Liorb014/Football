@@ -17,7 +17,7 @@ public class Main {
                     .forEach(match ->{
                         System.out.println(match.getHomeTeam().getName() +"---------VS--------" + match.getAwayTeam().getName());
                         leagueManager.addPointsForTeams(match);
-                        leagueManager.extracted();
+                        leagueManager.createLeagueTable();
                     });
             countDown(10);
             Utils.sleep(10);
@@ -54,7 +54,7 @@ public class Main {
                 }
 
                 case 2 -> {
-                    System.out.println("please enter tour desire amount of top teams u want to see: ");
+                    System.out.println("please enter your desire amount of top teams u want to see: ");
                     System.out.println(leagueManager.findTopScoringTeams(scanner.nextInt()));
                     optionsMenu(leagueManager,numberOfRounds);
 
@@ -74,7 +74,10 @@ public class Main {
                     System.out.println(leagueManager.getTopScorers(scanner.nextInt()));
                     optionsMenu(leagueManager,numberOfRounds);
                 }
-                case 6 -> {roundOfMatches(leagueManager,numberOfRounds+1);}
+                case 6 -> {
+                    System.out.println(leagueManager.getLeagueTable());
+                    roundOfMatches(leagueManager,numberOfRounds+1);
+                }
                 default -> optionsMenu(leagueManager,numberOfRounds);
             }
         }catch (InputMismatchException | IndexOutOfBoundsException | IllegalArgumentException e  ){

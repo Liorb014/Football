@@ -14,11 +14,25 @@ public class Match {
     private List<Goal> goals;
 
 
+    public Long getHomeGoals() {
+        return homeGoals;
+    }
+
+    public Long getAwayGoals() {
+        return awayGoals;
+    }
+
     public Match(int id, Team homeTeam, Team awayTeam, List<Goal> goals) {
         this.id = id;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.goals = goals;
+    }
+
+    private Long getTeamGoals (Team team){
+        return this.goals.stream()
+                .map(Goal::getScorer)
+                .filter(player -> team.getPlayerList().contains(player)).count();
     }
 
     public int getId() {
@@ -37,21 +51,10 @@ public class Match {
         return goals;
     }
 
+
+
     public boolean didTeamPlayGame(int id){
         return this.awayTeam.sameID(id) || this.homeTeam.sameID(id);
-    }
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setHomeTeam(Team homeTeam) {
-        this.homeTeam = homeTeam;
-    }
-
-    public void setAwayTeam(Team awayTeam) {
-        this.awayTeam = awayTeam;
     }
 
 //    private int randomMinute () {

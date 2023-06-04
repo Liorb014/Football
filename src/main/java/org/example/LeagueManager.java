@@ -13,6 +13,10 @@ public class LeagueManager {
     public List<Match> possibleMatches = new ArrayList<>();
     public List<Team> leagueTable;
 
+    public List<Team> getLeagueTable() {
+        return leagueTable;
+    }
+
     public LeagueManager() {
         List<String> data = FileHandler.readFile();
         teamList = data
@@ -22,11 +26,15 @@ public class LeagueManager {
 
     }
 
-    public void extracted() {
-        leagueTable = teamList.stream()
-                .sorted(Comparator.comparing(Team::getPoints).reversed())
-            //    .sorted(Comparator.comparing().reversed())
+    public void createLeagueTable() {
+        this.leagueTable = this.teamList.stream()
+                .sorted(Comparator.comparing(Team::getPoints).reversed().
+                        thenComparing(Comparator.comparing(team -> getTeamGoalCount((Team) team)-getTeamGoalNotCount((Team) team))
+                                .thenComparing(Comparator.comparing(team->team.toString()))))
                 .collect(toList());
+              /*  .sorted(Comparator.comparing(team -> getTeamGoalCount(team)-getTeamGoalNotCount(team)))
+                .sorted(Comparator.comparing(team->team.toString()))*/
+
     }
 
     public List<Match> findMatchesByTeam(int teamId) {
@@ -93,20 +101,19 @@ public class LeagueManager {
     public void addPointsForTeams (Match currentMatch) {
         Team homeTeam = currentMatch.getHomeTeam();
         Team awayTeam = currentMatch.getAwayTeam();
-        Long goalsForHomeTeam = currentMatch.getGoals().stream()
-                .map(Goal::getScorer)
-                .filter(player -> findPlayerTeam(player) == homeTeam)
-                .count();
-        Long goalsForAwayTeam = currentMatch.getGoals().stream()
-                .map(Goal::getScorer)
-                .filter(player -> findPlayerTeam(player) == awayTeam)
-                .count();
-        if (goalsForHomeTeam > goalsForAwayTeam) {
+//        if (currentMatch.getHomeGoals() > currentMatch.getAwayGoals()) {
+//            homeTeam.addPoints(3);
+//        } else if (currentMatch.getHomeGoals().equals( currentMatch.getAwayGoals())) {
+//            homeTeam.addPoints(1);
+//            awayTeam.addPoints(1);
+//
+        if (getTeamGoalCount(homeTeam) > getTeamGoalCount(awayTeam)) {
             homeTeam.addPoints(3);
-        } else if (goalsForHomeTeam == goalsForAwayTeam) {
+        } else if (getTeamGoalCount(homeTeam) == getTeamGoalCount(awayTeam)){
             homeTeam.addPoints(1);
             awayTeam.addPoints(1);
-        } else {
+        }
+        else {
             awayTeam.addPoints(3);
         }
     }
@@ -125,7 +132,7 @@ public class LeagueManager {
     }
 
     public long getTeamGoalCount(Team team){
-      return this.matches
+        return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(team.getId()))
                 .map(Match::getGoals)
