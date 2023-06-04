@@ -1,13 +1,10 @@
 package org.example;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.*;
 
 public class LeagueManager {
@@ -26,18 +23,14 @@ public class LeagueManager {
                 .stream()
                 .map(Team::new)
                 .collect(toList());
-
     }
 
     public void createLeagueTable() {
         this.leagueTable = this.teamList.stream()
                 .sorted(Comparator.comparing(Team::getPoints).reversed().
-                        thenComparing(Comparator.comparing(team -> getTeamGoalCount((Team) team)-getTeamGoalNotCount((Team) team))
-                                .thenComparing(Comparator.comparing(team->team.toString()))))
+                        thenComparing(Comparator.comparing(team -> getTeamGoalCount((Team) team) - getTeamGoalTakenCount((Team) team))
+                                .thenComparing(team -> team.toString())))
                 .collect(toList());
-              /*  .sorted(Comparator.comparing(team -> getTeamGoalCount(team)-getTeamGoalNotCount(team)))
-                .sorted(Comparator.comparing(team->team.toString()))*/
-
     }
 
     public List<Match> findMatchesByTeam(int teamId) {
@@ -49,39 +42,11 @@ public class LeagueManager {
     }
 
     public List<Team> findTopScoringTeams(int n) {
-//            List<Team> topScoringTeams = goalsPerTeam.entrySet().stream()
-//                    .sorted(Map.Entry.<Team, Integer>comparingByValue(Comparator.reverseOrder()))
-//                    .limit(n)
-//                    .map(Map.Entry::getKey)
-//                    .collect(Collectors.toList());
-
-//            return topScoringTeams;
-//        Map<Team, Long> temp = this.matches
-//                .stream()
-//                .map(match -> match.getGoals())
-//                .flatMap(List::stream)
-//                .map(Goal::getScorer)
-//                .map(player -> findPlayerTeam(player))
-//                .collect(groupingBy(Function.identity(), counting()));
-        this.teamList.
-                stream()
-                //            .map(team -> getTeamGoalCount(team))
-                .forEach(team -> System.out.println(getTeamGoalCount(team)));
-
         return this.teamList.
                 stream()
-    //            .map(team -> getTeamGoalCount(team))
-                .sorted(comparing(team ->  getTeamGoalCount((Team) team)).reversed())
+                .sorted(comparing(team -> getTeamGoalCount((Team) team)).reversed())
+                .limit(n)
                 .collect(toList());
-
-
-
-//        return temp.entrySet().stream()
-//                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-//                .limit(n)
-//                .map(Map.Entry::getKey)
-//                .toList();
-        //working ( if team did not score it will not count )
     }
 
     public List<Player> findPlayersWithAtLeastNGoals(int n) {
@@ -104,7 +69,7 @@ public class LeagueManager {
         return leagueTable.get(position);
     }
 
-    public Map<Integer, Integer> getTopScorers(int n){
+    public Map<Integer, Integer> getTopScorers(int n) {
         Map<Integer, Integer> temp = this.matches
                 .stream()
                 .map(Match::getGoals)
@@ -120,56 +85,51 @@ public class LeagueManager {
                 .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), entry.getValue()), HashMap::putAll);
         //working
     }
-    public void addPointsForTeams (Match currentMatch) {
+
+    public void addPointsForTeams(Match currentMatch) {
         Team homeTeam = currentMatch.getHomeTeam();
         Team awayTeam = currentMatch.getAwayTeam();
-//        if (currentMatch.getHomeGoals() > currentMatch.getAwayGoals()) {
-//            homeTeam.addPoints(3);
-//        } else if (currentMatch.getHomeGoals().equals( currentMatch.getAwayGoals())) {
-//            homeTeam.addPoints(1);
-//            awayTeam.addPoints(1);
-//
+
         if (getTeamGoalCount(homeTeam) > getTeamGoalCount(awayTeam)) {
-            homeTeam.addPoints(3);
-        } else if (getTeamGoalCount(homeTeam) == getTeamGoalCount(awayTeam)){
-            homeTeam.addPoints(1);
-            awayTeam.addPoints(1);
+            homeTeam.addPoints(TEAM_WIN_SCORE);
+        } else if (getTeamGoalCount(homeTeam) == getTeamGoalCount(awayTeam)) {
+            homeTeam.addPoints(TEAM_DRAW_SCORE);
+            awayTeam.addPoints(TEAM_DRAW_SCORE);
+        } else {
+            awayTeam.addPoints(TEAM_WIN_SCORE);
         }
-        else {
-            awayTeam.addPoints(3);
-        }
-    }
-    public Team findPlayerTeam(Player player) {
-        Team team1 = this.teamList
-                .stream()
-                .filter(team -> team.getPlayerList().contains(player)).findFirst().get();
-        return team1;
     }
 
+  /*  public Team findPlayerTeam(Player player) {
+        return this.teamList
+                .stream()
+                .filter(team -> team.getPlayerList().contains(player)).findFirst().get();
+    }*/
+
     public static List<Player> createPlayerList() {
-        List<Player>  temp = new ArrayList<>();
-        temp = Stream.generate(Player::new).limit(15).collect(toList());
+        List<Player> temp;
+        temp = Stream.generate(Player::new).limit(MAX_PEOPLE_AT_TEAM).collect(toList());
         return temp;
     }
 
-    public long getTeamGoalCount(Team team){
+    public long getTeamGoalCount(Team team) {
         return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(team.getId()))
                 .map(Match::getGoals)
                 .flatMap(List::stream)
                 .filter(goal -> team.getPlayerList().contains(goal.getScorer()))
-                .collect(counting());
+                .count();
     }
 
-    public long getTeamGoalNotCount(Team team){
+    public long getTeamGoalTakenCount(Team team) {
         return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(team.getId()))
                 .map(Match::getGoals)
                 .flatMap(List::stream)
                 .filter(goal -> !team.getPlayerList().contains(goal.getScorer()))
-                .collect(counting());
+                .count();
     }
 
     public List<Match> generatePossibleMatches() {
@@ -177,7 +137,7 @@ public class LeagueManager {
                 .flatMap(team1 -> teamList
                         .stream()
                         .filter(team2 -> team1 != team2 && team2.getId() > team1.getId())
-                        .map(team2 -> new Match(Utils.getNewMatchId(), team1, team2, generateGoalList(team1, team2))))
+                        .map(team2 -> new Match(team1, team2, generateGoalList(team1, team2))))
                 .toList();
         return possibleMatches;
     }
@@ -204,17 +164,11 @@ public class LeagueManager {
                     .stream()
                     .skip(size)
                     .filter(match -> {
-                        // Check if the home team and away team have already played.
                         if (!playedTeams.contains(match.getHomeTeam()) && !playedTeams.contains(match.getAwayTeam())) {
-
-                            // Add the home team and away team to the played teams set.
                             playedTeams.add(match.getHomeTeam());
                             playedTeams.add(match.getAwayTeam());
-
-                            // Return true to indicate that the match should be included in the output.
                             return true;
                         } else {
-                            // Return false to indicate that the match should not be included in the output.
                             return false;
                         }
                     })
@@ -226,15 +180,31 @@ public class LeagueManager {
                 possibleMatches = List.copyOf(newLIst);
             }
         }
+
+        output.
+                stream()
+                .forEach(match -> match.setId(Utils.getNewMatchId()));
+
+        output
+                .stream()
+                .forEach(match -> match.getGoals()
+                        .stream()
+                        .forEach(goal -> goal.setId(Utils.getNewGoalId())));
+
         possibleMatches = possibleMatches
                 .stream()
                 .filter(Predicate.not(output::contains))
                 .collect(toList());
+
         matches.addAll(output);
         return output;
     }
 
-    public List<Goal> generateGoalList (Team team1, Team team2) {
+    public List<Team> getLeagueTable() {
+        return leagueTable;
+    }
+
+    public List<Goal> generateGoalList(Team team1, Team team2) {
         List<Player> playerList = new ArrayList<>(team1.getPlayerList());
         playerList.addAll(team2.getPlayerList());
 

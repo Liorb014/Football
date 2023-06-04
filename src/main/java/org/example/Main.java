@@ -19,8 +19,9 @@ public class Main {
                         leagueManager.addPointsForTeams(match);
                         leagueManager.createLeagueTable();
                     });
-            countDown(10);
-            Utils.sleep(10);
+            countDown(1);
+            Utils.sleep(1);
+            System.out.println(leagueManager.getLeagueTable());
             optionsMenu(leagueManager,numberOfRounds);
         }
     }
@@ -35,7 +36,7 @@ public class Main {
         }).start();
     }
 
-    public static void optionsMenu(LeagueManager leagueManager, int numberOfRounds){
+    public static void optionsMenu(LeagueManager leagueManager, int numberOfRounds){;
         Scanner scanner = new Scanner(System.in);
         System.out.println("press 1 to find matches by team" +
                 "\npress 2 to find top scoring teams" +
@@ -75,7 +76,6 @@ public class Main {
                     optionsMenu(leagueManager,numberOfRounds);
                 }
                 case 6 -> {
-                    System.out.println(leagueManager.getLeagueTable());
                     roundOfMatches(leagueManager,numberOfRounds+1);
                 }
                 default -> optionsMenu(leagueManager,numberOfRounds);

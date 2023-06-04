@@ -13,17 +13,8 @@ public class Player {
         this.lastName = Utils.LAST_NAMES.get(new Random().nextInt(Utils.LAST_NAMES.size()));
     }
 
-
     public int getId() {
         return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
     }
 
     @Override

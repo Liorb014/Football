@@ -9,34 +9,12 @@ public class Match {
     private Team homeTeam;
     private Team awayTeam;
     private List<Goal> goals;
-    private Long homeGoals;
-    private Long awayGoals;
 
-    public Long getHomeGoals() {
-        return homeGoals;
-    }
-
-    public Long getAwayGoals() {
-        return awayGoals;
-    }
-
-    public Match(int id, Team homeTeam, Team awayTeam, List<Goal> goals) {
-        this.id = id;
+    public Match( Team homeTeam, Team awayTeam, List<Goal> goals) {
+        this.id = 0;
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.goals = goals;
-        this.homeGoals = getTeamGoals(this.homeTeam);
-        this.awayGoals = getTeamGoals(this.awayTeam);
-    }
-
-    private Long getTeamGoals (Team team){
-        return this.goals.stream()
-                .map(Goal::getScorer)
-                .filter(player -> team.getPlayerList().contains(player)).count();
-    }
-
-    public int getId() {
-        return id;
     }
 
     public Team getHomeTeam() {
@@ -51,38 +29,21 @@ public class Match {
         return goals;
     }
 
-
-
     public boolean didTeamPlayGame(int id){
         return this.awayTeam.sameID(id) || this.homeTeam.sameID(id);
     }
 
-//    private int randomMinute () {
-//        Random random = new Random();
-//        int randomMinute = random.nextInt(1,11);
-//        return randomMinute;
-//    }
-//    private Player getRandomScorer () {
-//
-//    }
-//    public void addGoal() {
-//        Goal goal = new Goal(Utils.getNewGoalId(),randomMinute(), )
-//        this.goals =
-//    }
 
-
-    public  List<Team> getTeams(){
-        return List.of(this.homeTeam , this.awayTeam);
+    public void setId(int id) {
+        this.id = id;
     }
-
 
     @Override
     public String toString() {
-        return "Match{" +
-                "id=" + id +
-                ", homeTeam=" + homeTeam +
-                ", awayTeam=" + awayTeam +
-                ", goals=" + goals +
-                '}';
+        return "Match " +
+                "id = " + this.id +
+                ", homeTeam = " + this.homeTeam .getName()+
+                ", awayTeam = " + this.awayTeam.getName() +
+                ", goals =\n " + this.goals +"\n";
     }
 }
