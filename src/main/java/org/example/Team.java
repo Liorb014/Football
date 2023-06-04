@@ -10,11 +10,13 @@ public class Team {
     private int points;
     private Integer position;
     public static final int POINTS_START = 0;
+    public static final int ID_INDEX = 0;
+    public static final int NAME_INDEX = 1;
 
     public Team(String line) {
         String[] temp =line.split(",");
-        this.id = Integer.parseInt(temp[0]);
-        this.name = temp[1];
+        this.id = Integer.parseInt(temp[ID_INDEX]);
+        this.name = temp[NAME_INDEX];
         this.playerList=LeagueManager.createPlayerList();
         this.points = POINTS_START;
         this.position = null;

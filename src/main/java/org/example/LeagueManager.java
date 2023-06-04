@@ -13,9 +13,15 @@ public class LeagueManager {
     public List<Match> possibleMatches = new ArrayList<>();
     public List<Team> leagueTable;
 
-    public List<Team> getLeagueTable() {
-        return leagueTable;
-    }
+    private final int TEAM_WIN_SCORE = 3;
+    private final int TEAM_DRAW_SCORE = 1;
+    private final int ROUND = 5;
+    private final int MAX_POSSIBLE_MATCHES = 90;
+    public static final int MAX_PEOPLE_AT_TEAM = 15;
+ /*   private final int ROUND = 25;
+    private final int ROUND = 20;
+    private final int ROUND = 15;
+    private final int ROUND = 10;*/
 
     public LeagueManager() {
         List<String> data = FileHandler.readFile();
@@ -142,7 +148,6 @@ public class LeagueManager {
         return possibleMatches;
     }
 
-
     public List<Match> generateMatchRound() {
         int size = 2;
         List<Match> output = new ArrayList<>();
@@ -157,7 +162,7 @@ public class LeagueManager {
         } else if (possibleMatches.size() == 0) {
             return null;
         }
-        while (output.size() != 5) {
+        while (output.size() != ROUND) {
             output.clear();
             List<Team> playedTeams = new ArrayList<>();
             output = possibleMatches
@@ -172,9 +177,9 @@ public class LeagueManager {
                             return false;
                         }
                     })
-                    .limit(5)
+                    .limit(ROUND)
                     .collect(toList());
-            if (output.size() != 5) {
+            if (output.size() != ROUND) {
                 List<Match> newLIst = new ArrayList<>(possibleMatches);
                 Collections.reverse(newLIst);
                 possibleMatches = List.copyOf(newLIst);
@@ -210,8 +215,8 @@ public class LeagueManager {
 
         Random random = new Random();
         return Stream
-                .generate(() -> new Goal(Utils.getNewGoalId(), random.nextInt(91), playerList.get(random.nextInt(playerList.size()))
-                )).limit(random.nextInt(5))
+                .generate(() -> new Goal( random.nextInt(MAX_POSSIBLE_MATCHES+1), playerList.get(random.nextInt(playerList.size()))
+                )).limit(random.nextInt(ROUND))
                 .collect(toList());
     }
 }
