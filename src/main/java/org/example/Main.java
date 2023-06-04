@@ -80,7 +80,7 @@ public class Main {
                 }
                 default -> optionsMenu(leagueManager,numberOfRounds);
             }
-        }catch (InputMismatchException | IndexOutOfBoundsException | IllegalArgumentException e  ){
+        } catch (InputMismatchException | IndexOutOfBoundsException | IllegalArgumentException e  ){
             System.out.println("enter valid number");
             optionsMenu(leagueManager , numberOfRounds);
         }

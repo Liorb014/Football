@@ -2,17 +2,15 @@ package org.example;
 
 import com.sun.source.tree.Scope;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class Match {
     private int id;
     private Team homeTeam;
     private Team awayTeam;
     private List<Goal> goals;
-
+    private Long homeGoals;
+    private Long awayGoals;
 
     public Long getHomeGoals() {
         return homeGoals;
@@ -27,6 +25,8 @@ public class Match {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.goals = goals;
+        this.homeGoals = getTeamGoals(this.homeTeam);
+        this.awayGoals = getTeamGoals(this.awayTeam);
     }
 
     private Long getTeamGoals (Team team){

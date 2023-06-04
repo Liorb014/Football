@@ -3,6 +3,7 @@ package org.example;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -46,20 +47,39 @@ public class LeagueManager {
     }
 
     public List<Team> findTopScoringTeams(int n) {
-        Map<Team, Long> temp = this.matches
-                .stream()
-                .map(match -> match.getGoals())
-                .flatMap(List::stream)
-                .map(Goal::getScorer)
-                .map(player -> findPlayerTeam(player))
-                .collect(groupingBy(Function.identity(), counting()));
+//            List<Team> topScoringTeams = goalsPerTeam.entrySet().stream()
+//                    .sorted(Map.Entry.<Team, Integer>comparingByValue(Comparator.reverseOrder()))
+//                    .limit(n)
+//                    .map(Map.Entry::getKey)
+//                    .collect(Collectors.toList());
 
-        return temp.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(n)
-                .map(Map.Entry::getKey)
-                .toList();
-        //working ( if team did not score it will now count )
+//            return topScoringTeams;
+//        Map<Team, Long> temp = this.matches
+//                .stream()
+//                .map(match -> match.getGoals())
+//                .flatMap(List::stream)
+//                .map(Goal::getScorer)
+//                .map(player -> findPlayerTeam(player))
+//                .collect(groupingBy(Function.identity(), counting()));
+        this.teamList.
+                stream()
+                //            .map(team -> getTeamGoalCount(team))
+                .forEach(team -> System.out.println(getTeamGoalCount(team)));
+
+        return this.teamList.
+                stream()
+    //            .map(team -> getTeamGoalCount(team))
+                .sorted(comparing(team ->  getTeamGoalCount((Team) team)).reversed())
+                .collect(toList());
+
+
+
+//        return temp.entrySet().stream()
+//                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+//                .limit(n)
+//                .map(Map.Entry::getKey)
+//                .toList();
+        //working ( if team did not score it will not count )
     }
 
     public List<Player> findPlayersWithAtLeastNGoals(int n) {
@@ -117,7 +137,6 @@ public class LeagueManager {
             awayTeam.addPoints(3);
         }
     }
-
     public Team findPlayerTeam(Player player) {
         Team team1 = this.teamList
                 .stream()
@@ -137,7 +156,7 @@ public class LeagueManager {
                 .filter(match -> match.didTeamPlayGame(team.getId()))
                 .map(Match::getGoals)
                 .flatMap(List::stream)
-              .filter(goal -> team.getPlayerList().contains(goal.getScorer()))
+                .filter(goal -> team.getPlayerList().contains(goal.getScorer()))
                 .collect(counting());
     }
 
