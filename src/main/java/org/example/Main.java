@@ -17,6 +17,7 @@ public class Main {
                     .forEach(match ->{
                         System.out.println(match.getHomeTeam().getName() +"---------VS--------" + match.getAwayTeam().getName());
                         leagueManager.addPointsForTeams(match);
+                        leagueManager.createLeagueTable();
                         countDown(Utils.TIME_TO_COUNTDOWN);
                         Utils.sleep(Utils.TIME_TO_COUNTDOWN);
                         System.out.println("\n"+match);

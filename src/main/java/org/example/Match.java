@@ -48,7 +48,7 @@ public class Match {
     }
     public String goalsDisplay(){
         if (this.goals.isEmpty()){
-            return  "no goals got scored this match";
+            return  "\nno goals got scored this match";
         }else return this.goals.toString();
     }
 }
