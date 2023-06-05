@@ -7,40 +7,40 @@ public class Main {
     public static void main(String[] args) {
         LeagueManager leagueManager = new LeagueManager();
         leagueManager.generatePossibleMatches();
-        roundOfMatches(leagueManager , 1);
+        roundOfMatches(leagueManager , Utils.ROUND_START);
     }
 
     public static void roundOfMatches(LeagueManager leagueManager, int numberOfRounds){
-        if (numberOfRounds<=9){
+        if (numberOfRounds<Utils.ROUND_END){
             leagueManager.generateMatchRound()
                     .stream()
                     .forEach(match ->{
                         System.out.println(match.getHomeTeam().getName() +"---------VS--------" + match.getAwayTeam().getName());
                         leagueManager.addPointsForTeams(match);
-                        countDown(10);
-                        Utils.sleep(10);
-
-                        System.out.println(match);
-                        leagueManager.createLeagueTable();
+                        countDown(Utils.TIME_TO_COUNTDOWN);
+                        Utils.sleep(Utils.TIME_TO_COUNTDOWN);
+                        System.out.println("\n"+match);
+                        System.out.println("\n"+match.getHomeTeam().getName() +"'s goals : " + leagueManager.getTeamGoalWasScoredCount(match.getHomeTeam()) + "   " +
+                                match.getAwayTeam().getName() +"'s goals : " + leagueManager.getTeamGoalWasScoredCount(match.getAwayTeam())+ "\n");
                     });
-            System.out.println(leagueManager.getLeagueTable());
+            System.out.println("league table: "+leagueManager.getLeagueTable());
             optionsMenu(leagueManager,numberOfRounds);
         }
     }
 
     public synchronized static void countDown(int counter){
         new Thread(()->{
-            if (counter>0){
+            if (counter>Utils.END_OF_TIME){
                 System.out.println(counter);
-                Utils.sleep(1);
-                countDown(counter-1);
+                Utils.sleep(Utils.TIME_TO_COUNT);
+                countDown(counter-Utils.TIME_TO_COUNT);
             }
         }).start();
     }
 
     public static void optionsMenu(LeagueManager leagueManager, int numberOfRounds){;
         Scanner scanner = new Scanner(System.in);
-        System.out.println("press 1 to find matches by team" +
+        System.out.println("\npress 1 to find matches by team" +
                 "\npress 2 to find top scoring teams" +
                 "\npress 3 to find players with the amount of your require goals"+
                 "\npress 4 to get team by position"+

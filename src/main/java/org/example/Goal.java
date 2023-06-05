@@ -24,7 +24,6 @@ public class Goal {
 
     @Override
     public String toString() {
-        return "Goal id = " + this.id +", minute  = " + minute +
-                " scorer = " + this.scorer ;
+        return "\n Goal id = " + this.id +", minute  = " + minute + " scorer = " + this.scorer ;
     }
 }

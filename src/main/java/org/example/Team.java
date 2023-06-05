@@ -44,7 +44,7 @@ public class Team {
 
     @Override
     public String toString() {
-        return "Team name : " +getName() +" Team ID: " +getId() +" ,points "+ points + " \n";
+        return "\n Team name : " +getName() +" Team ID: " +getId() +" ,points "+ points + " ";
     }
 
 

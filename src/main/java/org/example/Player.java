@@ -32,7 +32,7 @@ public class Player {
     public String toString() {
         return "Player id = " + this.id +
                 ", name = " + this.firstName +
-                " " + this.lastName + "\n";
+                " " + this.lastName ;
     }
 
 }

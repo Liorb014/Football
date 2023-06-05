@@ -44,7 +44,7 @@ public class Match {
                 "id = " + this.id +
                 ", homeTeam = " + this.homeTeam .getName()+
                 ", awayTeam = " + this.awayTeam.getName() +
-                ", goals =\n " + goalsDisplay() +"\n";
+                ", goals = " + goalsDisplay() ;
     }
     public String goalsDisplay(){
         if (this.goals.isEmpty()){
