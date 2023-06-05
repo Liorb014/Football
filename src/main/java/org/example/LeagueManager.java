@@ -18,10 +18,13 @@ public class LeagueManager {
     private final int ROUND = 5;
     private final int MAX_POSSIBLE_MATCHES = 90;
     public static final int MAX_PEOPLE_AT_TEAM = 15;
- /*   private final int ROUND = 25;
-    private final int ROUND = 20;
-    private final int ROUND = 15;
-    private final int ROUND = 10;*/
+    private final int FROM_ROUND_FOUR = 25;
+    private final int FROM_ROUND_FIVE = 20;
+    private final int FROM_ROUND_SEVEN = 10;
+    private final int FROM_ROUND_EIGHT = 5;
+    private final int SKIP_TWO_TEAMS = 2;
+    private final int SKIP_ONE_TEAM = 1;
+    private final int DONT_SKIP_ON_TEAM = 0;
 
     public LeagueManager() {
         List<String> data = FileHandler.readFile();
@@ -31,28 +34,22 @@ public class LeagueManager {
                 .collect(toList());
     }
 
-    public void createLeagueTable() {
-        this.leagueTable = this.teamList.stream()
-                .sorted(Comparator.comparing(Team::getPoints).reversed().
-                        thenComparing(Comparator.comparing(team -> getTeamGoalCount((Team) team) - getTeamGoalTakenCount((Team) team))
-                                .thenComparing(team -> team.toString())))
-                .collect(toList());
-    }
-
     public List<Match> findMatchesByTeam(int teamId) {
+        System.out.println("matches that have been played: ");
         return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(teamId))
                 .collect(toList());
-        // working
     }
 
     public List<Team> findTopScoringTeams(int n) {
-        return this.teamList.
+        List<Team> temp = this.teamList.
                 stream()
-                .sorted(comparing(team -> getTeamGoalCount((Team) team)).reversed())
+                .sorted(comparing(team -> getTeamGoalWasScoredCount((Team) team)).reversed())
                 .limit(n)
                 .collect(toList());
+        this.teamList.stream().forEach(team ->{if (!temp.contains(team)){temp.add(team);};});
+        return temp;
     }
 
     public List<Player> findPlayersWithAtLeastNGoals(int n) {
@@ -68,7 +65,6 @@ public class LeagueManager {
                 .stream()
                 .filter(key -> temp.get(key) >= n)
                 .collect(toList());
-        //working
     }
 
     public Team getTeamByPosition(int position) {
@@ -82,6 +78,7 @@ public class LeagueManager {
                 .flatMap(List::stream)
                 .map(Goal::getScorer)
                 .collect(groupingBy(Player::getId, summingInt(player -> 1)));
+        System.out.println("{id=how much scored,...}");
         return temp
                 .entrySet()
                 .stream()
@@ -89,16 +86,23 @@ public class LeagueManager {
                 .limit(n)
                 .sorted(Map.Entry.comparingByValue())
                 .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), entry.getValue()), HashMap::putAll);
-        //working
+    }
+
+    public void createLeagueTable() {
+        this.leagueTable = this.teamList.stream()
+                .sorted(Comparator.comparing(Team::getPoints).reversed().
+                        thenComparing(Comparator.comparing(team -> getTeamGoalWasScoredCount((Team) team) - getTeamGoalWasTakenCount((Team) team))
+                                .thenComparing(team -> team.toString())))
+                .collect(toList());
     }
 
     public void addPointsForTeams(Match currentMatch) {
         Team homeTeam = currentMatch.getHomeTeam();
         Team awayTeam = currentMatch.getAwayTeam();
 
-        if (getTeamGoalCount(homeTeam) > getTeamGoalCount(awayTeam)) {
+        if (getTeamGoalWasScoredCount(homeTeam) > getTeamGoalWasScoredCount(awayTeam)) {
             homeTeam.addPoints(TEAM_WIN_SCORE);
-        } else if (getTeamGoalCount(homeTeam) == getTeamGoalCount(awayTeam)) {
+        } else if (getTeamGoalWasScoredCount(homeTeam) == getTeamGoalWasScoredCount(awayTeam)) {
             homeTeam.addPoints(TEAM_DRAW_SCORE);
             awayTeam.addPoints(TEAM_DRAW_SCORE);
         } else {
@@ -106,19 +110,13 @@ public class LeagueManager {
         }
     }
 
-  /*  public Team findPlayerTeam(Player player) {
-        return this.teamList
-                .stream()
-                .filter(team -> team.getPlayerList().contains(player)).findFirst().get();
-    }*/
-
     public static List<Player> createPlayerList() {
         List<Player> temp;
         temp = Stream.generate(Player::new).limit(MAX_PEOPLE_AT_TEAM).collect(toList());
         return temp;
     }
 
-    public long getTeamGoalCount(Team team) {
+    public long getTeamGoalWasScoredCount(Team team) {
         return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(team.getId()))
@@ -128,7 +126,7 @@ public class LeagueManager {
                 .count();
     }
 
-    public long getTeamGoalTakenCount(Team team) {
+    public long getTeamGoalWasTakenCount(Team team) {
         return this.matches
                 .stream()
                 .filter(match -> match.didTeamPlayGame(team.getId()))
@@ -148,19 +146,34 @@ public class LeagueManager {
         return possibleMatches;
     }
 
+    public List<Team> getLeagueTable() {
+        return leagueTable;
+    }
+
+    public List<Goal> generateGoalList(Team team1, Team team2) {
+        List<Player> playerList = new ArrayList<>(team1.getPlayerList());
+        playerList.addAll(team2.getPlayerList());
+
+        Random random = new Random();
+        return Stream
+                .generate(() -> new Goal( random.nextInt(MAX_POSSIBLE_MATCHES+1), playerList.get(random.nextInt(playerList.size()))
+                )).limit(random.nextInt(ROUND))
+                .collect(toList());
+    }
+
     public List<Match> generateMatchRound() {
-        int size = 2;
+        Integer size = SKIP_TWO_TEAMS;
         List<Match> output = new ArrayList<>();
-        if (possibleMatches.size() == 25) {
-            size = 0;
-        } else if (possibleMatches.size() == 20) {
-            size = 2;
-        } else if (possibleMatches.size() == 10) {
-            size = 1;
-        } else if (possibleMatches.size() == 5) {
-            size = 0;
-        } else if (possibleMatches.size() == 0) {
-            return null;
+        if (possibleMatches.size() == FROM_ROUND_FOUR) {
+            size = DONT_SKIP_ON_TEAM;
+        } else if (possibleMatches.size() == FROM_ROUND_FIVE) {
+            size = SKIP_TWO_TEAMS;
+        } else if (possibleMatches.size() == FROM_ROUND_SEVEN) {
+            size = SKIP_ONE_TEAM;
+        } else if (possibleMatches.size() == FROM_ROUND_EIGHT) {
+            size = DONT_SKIP_ON_TEAM;
+        } else if (possibleMatches.size() == DONT_SKIP_ON_TEAM) {
+            size= null;
         }
         while (output.size() != ROUND) {
             output.clear();
@@ -203,20 +216,5 @@ public class LeagueManager {
 
         matches.addAll(output);
         return output;
-    }
-
-    public List<Team> getLeagueTable() {
-        return leagueTable;
-    }
-
-    public List<Goal> generateGoalList(Team team1, Team team2) {
-        List<Player> playerList = new ArrayList<>(team1.getPlayerList());
-        playerList.addAll(team2.getPlayerList());
-
-        Random random = new Random();
-        return Stream
-                .generate(() -> new Goal( random.nextInt(MAX_POSSIBLE_MATCHES+1), playerList.get(random.nextInt(playerList.size()))
-                )).limit(random.nextInt(ROUND))
-                .collect(toList());
     }
 }

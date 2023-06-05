@@ -30,8 +30,8 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player" + "id = " + this.id +
-                ", full name = " + this.firstName +
+        return "Player id = " + this.id +
+                ", name = " + this.firstName +
                 " " + this.lastName + "\n";
     }
 

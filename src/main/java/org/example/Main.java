@@ -17,10 +17,12 @@ public class Main {
                     .forEach(match ->{
                         System.out.println(match.getHomeTeam().getName() +"---------VS--------" + match.getAwayTeam().getName());
                         leagueManager.addPointsForTeams(match);
+                        countDown(10);
+                        Utils.sleep(10);
+
+                        System.out.println(match);
                         leagueManager.createLeagueTable();
                     });
-            countDown(1);
-            Utils.sleep(1);
             System.out.println(leagueManager.getLeagueTable());
             optionsMenu(leagueManager,numberOfRounds);
         }

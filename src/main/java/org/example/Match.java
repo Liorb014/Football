@@ -44,6 +44,11 @@ public class Match {
                 "id = " + this.id +
                 ", homeTeam = " + this.homeTeam .getName()+
                 ", awayTeam = " + this.awayTeam.getName() +
-                ", goals =\n " + this.goals +"\n";
+                ", goals =\n " + goalsDisplay() +"\n";
+    }
+    public String goalsDisplay(){
+        if (this.goals.isEmpty()){
+            return  "no goals got scored this match";
+        }else return this.goals.toString();
     }
 }
