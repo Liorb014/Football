@@ -8,16 +8,16 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 
 public class LeagueManager {
-    public List<Match> matches = new ArrayList<>();
-    public List<Team> teamList;
-    public List<Match> possibleMatches = new ArrayList<>();
-    public List<Team> leagueTable;
+    private List<Match> matches = new ArrayList<>();
+    private List<Team> teamList;
+    private List<Match> possibleMatches = new ArrayList<>();
+    private List<Team> leagueTable;
 
     private final int TEAM_WIN_SCORE = 3;
     private final int TEAM_DRAW_SCORE = 1;
     private final int ROUND = 5;
     private final int MAX_POSSIBLE_MATCHES = 90;
-    public static final int MAX_PEOPLE_AT_TEAM = 15;
+    private static final int MAX_PEOPLE_AT_TEAM = 15;
     private final int FROM_ROUND_FOUR = 25;
     private final int FROM_ROUND_FIVE = 20;
     private final int FROM_ROUND_SEVEN = 10;
@@ -27,7 +27,7 @@ public class LeagueManager {
     private final int DONT_SKIP_ON_TEAM = 0;
 
     public LeagueManager() {
-        List<String> data = FileHandler.readFile();
+        List<String> data = Utils.readFile();
         teamList = data
                 .stream()
                 .map(Team::new)
@@ -150,10 +150,9 @@ public class LeagueManager {
         return leagueTable;
     }
 
-    public List<Goal> generateGoalList(Team team1, Team team2) {
+    private List<Goal> generateGoalList(Team team1, Team team2) {
         List<Player> playerList = new ArrayList<>(team1.getPlayerList());
         playerList.addAll(team2.getPlayerList());
-
         Random random = new Random();
         return Stream
                 .generate(() -> new Goal( random.nextInt(MAX_POSSIBLE_MATCHES+1), playerList.get(random.nextInt(playerList.size()))
@@ -198,7 +197,6 @@ public class LeagueManager {
                 possibleMatches = List.copyOf(newLIst);
             }
         }
-
         output.
                 stream()
                 .forEach(match -> match.setId(Utils.getNewMatchId()));

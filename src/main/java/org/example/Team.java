@@ -47,11 +47,8 @@ public class Team {
         return "\n Team name : " +getName() +" Team ID: " +getId() +" ,points "+ points + " ";
     }
 
-
-
     public List<Player> getPlayerList() {
         return playerList;
     }
-
 
 }

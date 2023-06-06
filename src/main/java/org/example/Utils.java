@@ -1,6 +1,10 @@
 package org.example;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Utils {
     private static final int SECOND = 1000;
@@ -20,6 +24,18 @@ public class Utils {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+    }
+    private static final String PATH_TO_DATA_FILE = "src/main/java/org/example/Assets/Teams.csv";
+    public static List<String> readFile() {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(PATH_TO_DATA_FILE));
+            return bufferedReader
+                    .lines()
+                    .skip(1)
+                    .collect(Collectors.toList());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
     public static int getNewPlayerId(){
         return playerID++;
